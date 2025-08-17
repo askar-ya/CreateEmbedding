@@ -3,6 +3,7 @@ import psycopg2
 import os
 from dotenv import load_dotenv
 from datetime import datetime
+import httpx
 
 load_dotenv()
 token = os.getenv('OpenAiToken')
@@ -26,13 +27,12 @@ def log(*kwargs):
 
 def make_embedding(text: str):
     # Создает векторы из текста
-    client = OpenAI(api_key=token)
+    client = OpenAI(api_key=token, http_client=httpx.Client(proxy='socks5://HDR7yg:wh74ML@147.45.200.146:8000'))
 
     response = client.embeddings.create(
         input=text,
         model="text-embedding-3-small"
     )
-
     return response.data[0].embedding
 
 
