@@ -31,7 +31,7 @@ def make_embedding(text: str):
 
     response = client.embeddings.create(
         input=text,
-        model="text-embedding-3-small"
+        model="text-embedding-3-large"
     )
     return response.data[0].embedding
 
@@ -52,4 +52,3 @@ def search_embedding(text: str):
 
     output = cur.fetchall()
     print(output)
-
