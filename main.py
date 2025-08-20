@@ -13,8 +13,6 @@ while True:
 
 
         text = description + ' ' + transcribe
-        log(f"Reel text: {text}")
-        print(f"Reel text: {text}")
 
         embedding = make_embedding(text)
         psql.wright_embedding(embedding, reel_id)
