@@ -25,14 +25,22 @@ def log(*kwargs):
         f.write(date_str + out + "\n")
 
 
-def make_embedding(text: str):
+def make_embedding(text: str, n=0):
     # Создает векторы из текста
     client = OpenAI(api_key=token, http_client=httpx.Client(proxy='socks5://HDR7yg:wh74ML@147.45.200.146:8000'))
+    n += 1
 
-    response = client.embeddings.create(
-        input=text,
-        model="text-embedding-3-large"
-    )
+    try:
+        response = client.embeddings.create(
+            input=text,
+            model="text-embedding-3-large"
+        )
+    except Exception as e:
+        if n > 4:
+            return False
+        log(str(e))
+        return make_embedding(text, n)
+
     return response.data[0].embedding
 
 

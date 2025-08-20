@@ -15,6 +15,10 @@ while True:
         text = description + ' ' + transcribe
 
         embedding = make_embedding(text)
+        if not embedding:
+            log('to many requests')
+            break
+
         psql.wright_embedding(embedding, reel_id)
 
 
