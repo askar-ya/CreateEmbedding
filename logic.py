@@ -30,7 +30,7 @@ async def make_embedding(text: str, reel_id: int):
     # Создает векторы из текста
     client = AsyncOpenAI(
         api_key=token,
-        http_client=httpx.AsyncClient(proxy='socks5://HDR7yg:wh74ML@147.45.200.146:8000')
+        http_client=httpx.AsyncClient(proxy='socks5://2Lm8Cp:51Z4Pk@154.30.137.57:8000')
     )
 
     try:
