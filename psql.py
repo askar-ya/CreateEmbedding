@@ -7,6 +7,7 @@ utc_tz = timezone.utc
 
 load_dotenv()
 
+reels_page = '10'
 
 class Psql:
     """Класс для работы с базой данных Postgresql"""
@@ -75,19 +76,27 @@ class Psql:
         return state
 
     def get_reel_for_embedding(self):
-        q = 'SELECT id, url, description FROM reels r WHERE NOT EXISTS ( SELECT 1 FROM reel_embeddings WHERE reel_embeddings.reel_id = r.id ) order by id limit 1'
+        q = 'SELECT id, url, description FROM reels r WHERE NOT EXISTS ( SELECT 1 FROM reel_embeddings WHERE reel_embeddings.reel_id = r.id ) order by id limit ' + reels_page
         self.cursor.execute(q)
-        reel = self.cursor.fetchall()[0]
+        reels = self.cursor.fetchall()
 
-        q = f'SELECT text FROM reel_transcriptions where reel_id = {reel[0]} '
-        self.cursor.execute(q)
-        transcribe = self.cursor.fetchall()[0]
-        if transcribe:
-            transcribe = transcribe[0]
-            if transcribe in ['', ' ', 'error_save']:
-                transcribe = ''
+        out = []
 
-        return reel[0], reel[1], reel[2], transcribe
+        for reel in reels:
+            reel_id, url, description = reel[0], reel[1], reel[2]
+
+            q = f'SELECT text FROM reel_transcriptions where reel_id = {reel_id} '
+            self.cursor.execute(q)
+            transcribe = self.cursor.fetchall()[0]
+
+            if transcribe:
+                transcribe = transcribe[0]
+                if transcribe in ['', ' ', 'error_save']:
+                    transcribe = ''
+
+            out.append([reel_id, url, description, transcribe])
+
+        return out
 
     def wright_embedding(self, embedding: list[float], reel_id: int):
         self.cursor.execute(f"INSERT INTO reel_embeddings (reel_id, embedding) VALUES ({reel_id}, '{embedding}')")

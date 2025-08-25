@@ -1,9 +1,10 @@
-from openai import OpenAI
+from openai import OpenAI, AsyncOpenAI
 import psycopg2
 import os
 from dotenv import load_dotenv
 from datetime import datetime
 import httpx
+
 
 load_dotenv()
 token = os.getenv('OpenAiToken')
@@ -25,23 +26,24 @@ def log(*kwargs):
         f.write(date_str + out + "\n")
 
 
-def make_embedding(text: str, n=0):
+async def make_embedding(text: str, reel_id: int):
     # Создает векторы из текста
-    client = OpenAI(api_key=token, http_client=httpx.Client(proxy='socks5://HDR7yg:wh74ML@147.45.200.146:8000'))
-    n += 1
+    client = AsyncOpenAI(
+        api_key=token,
+        http_client=httpx.AsyncClient(proxy='socks5://HDR7yg:wh74ML@147.45.200.146:8000')
+    )
 
     try:
-        response = client.embeddings.create(
+        response = await client.embeddings.create(
             input=text,
             model="text-embedding-3-large"
         )
-    except Exception as e:
-        if n > 4:
-            return False
-        log(str(e))
-        return make_embedding(text, n)
+        return response.data[0].embedding, reel_id
 
-    return response.data[0].embedding
+    except Exception as e:
+        return [], reel_id
+
+
 
 
 def search_embedding(text: str):
